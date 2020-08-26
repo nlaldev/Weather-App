@@ -7,7 +7,7 @@
         : ''
     "
   >
-    <main class="search">
+    <div class="search">
       <input
         type="text"
         class="search__bar"
@@ -15,20 +15,20 @@
         v-model="query"
         @keypress="getWeather"
       />
+    </div>
 
-      <div class="weather" v-if="typeof weather.main != 'undefined'">
-        <span class="weather__location"
-          >{{ weather.name }}, {{ weather.sys.country }}</span
-        >
-        <span class="weather__date">{{ dateBuilder() }}</span>
-        <div class="weather__wrapper">
-          <span class="weather__stat">{{ weather.weather[0].main }}</span>
-          <div class="weather__temperature">
-            {{ Math.round(weather.main.temp) }}&deg;c
-          </div>
+    <div class="weather" v-if="typeof weather.main != 'undefined'">
+      <span class="weather__date">{{ dateBuilder() }}</span>
+      <div class="weather__wrapper">
+        <div class="weather__stat">{{ weather.weather[0].main }}</div>
+        <div class="weather__temperature">
+          {{ Math.round(weather.main.temp) }}&deg;c
         </div>
       </div>
-    </main>
+      <span class="weather__location"
+        >{{ weather.name }}, {{ weather.sys.country }}</span
+      >
+    </div>
   </div>
 </template>
 
@@ -90,8 +90,7 @@ export default {
       const day = days[d.getDay()];
       const date = d.getDate();
       const month = months[d.getMonth()];
-      const year = d.getFullYear();
-      return `${day} ${date} ${month} ${year}`;
+      return `${day}, ${month} ${date} `;
     },
   },
   // },
@@ -99,10 +98,31 @@ export default {
 </script>
 
 <style lang="scss">
+$tablet-breakpoint: 768px;
+$desktop-breakpoint: 1200px;
+
+@mixin tablet {
+  @media (min-width: $tablet-breakpoint) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop-breakpoint) {
+    @content;
+  }
+}
+
 @font-face {
   font-family: "helvetica-neue";
   src: url("./assets/helveticaneue/helveticaneue-thin.ttf");
-  font-weight: normal;
+  font-weight: thin;
+}
+
+@font-face {
+  font-family: "helvetica-neue";
+  src: url("./assets/helveticaneue/helveticaneue-light.ttf");
+  font-weight: lighter;
 }
 
 * {
@@ -119,6 +139,11 @@ export default {
   background-size: cover;
   min-height: 100vh;
   transition: 0.5s;
+  min-height: 100vh;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .app-warm {
@@ -127,21 +152,14 @@ export default {
 }
 
 .search {
-  // background: linear-gradient(
-  //   to bottom,
-  //   rgba(0, 0, 0, 0.25),
-  //   rgba(0, 0, 0, 0.75)
-  // );
-  min-height: 100vh;
-  padding: 25px;
-
+  margin-top: 20px;
   &__bar {
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    transition: 0.4s;
-    width: 90%;
+    transition: 0.5s;
     padding: 15px;
+    width: 100%;
     font-size: 20px;
     outline: none;
     border: none;
@@ -155,16 +173,22 @@ export default {
 }
 
 .weather {
+  margin-top: 25%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 50px;
-
+  align-items: center;
+  color: #fafafa;
   &__wrapper {
     padding: 30px;
+    margin: 25px 0 50px 0;
     background-color: rgba(255, 255, 255, 0.25);
     border-radius: 20px;
-    color: #fafafa;
+    transition: 0.5s;
+  }
+
+  &__date {
+    font-size: 24px;
   }
 
   &__stat {
@@ -174,7 +198,49 @@ export default {
 
   &__temperature {
     font-size: 90px;
+    font-weight: lighter;
     text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@include tablet {
+  .search {
+    &__bar {
+      width: 25%;
+    }
+  }
+
+  .weather {
+    margin-top: 25%;
+    &__wrapper {
+      width: 75%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    &__date {
+      font-size: 48px;
+    }
+
+    &__stat {
+      width: 50%;
+    }
+
+    &__temperature {
+      width: 50%;
+      border-left: 5px solid #fafafa;
+    }
+
+    &__location {
+      font-size: 24px;
+    }
+  }
+}
+
+@include desktop {
+  .weather {
+    margin-top: 10%;
   }
 }
 </style>
