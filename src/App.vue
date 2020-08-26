@@ -1,5 +1,12 @@
 <template>
-  <div class="app">
+  <div
+    class="app"
+    :class="
+      typeof weather.main !== 'undefined' && weather.main.temp >= 15
+        ? 'app-warm'
+        : ''
+    "
+  >
     <main class="search">
       <input
         type="text"
@@ -8,32 +15,30 @@
         v-model="query"
         @keypress="getWeather"
       />
+
+      <div class="weather" v-if="typeof weather.main != 'undefined'">
+        <span class="weather__location"
+          >{{ weather.name }}, {{ weather.sys.country }}</span
+        >
+        <span class="weather__date">{{ dateBuilder() }}</span>
+        <div class="weather__wrapper">
+          <span class="weather__stat">{{ weather.weather[0].main }}</span>
+          <div class="weather__temperature">
+            {{ Math.round(weather.main.temp) }}&deg;c
+          </div>
+        </div>
+      </div>
     </main>
-    <div class="weather__wrapper">
-      <div class="weather__location-wrapper">
-        <span class="weather__location">Vancouver, BC</span>
-        <span class="weather__date">Aug 26 2020</span>
-      </div>
-      <div class="weather__box">
-        <span class="weather__weather">Sunny</span>
-        <span class="weather__temperature">20 C</span>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import Vue from "vue";
-import axios from "axios";
-
-Vue.use(axios);
-
 export default {
   name: "App",
   data() {
     return {
+      url_base: "https://api.openweathermap.org/data/2.5/",
       api_key: "0f4aa31f6383d13c329b4ca035e1b8e9",
-      url: "https://api.openweathermap.org/data/2.5/",
       query: "",
       weather: {},
     };
@@ -41,19 +46,55 @@ export default {
   methods: {
     getWeather(e) {
       if (e.key == "Enter") {
-        axios
-          .get(
-            `${this.url}weather?q=${this.query}&units=metric&APPID=${this.api_key}`
-          )
+        fetch(
+          `${this.url_base}weather?q=${this.query}&units=metric&APPID=${this.api_key}`
+        )
           .then((res) => {
-            console.log(res);
-            this.weather = res;
+            return res.json();
           })
+          .then(this.setResults)
           .catch((err) => console.error(err));
-        console.log("fetching weather...");
       }
     },
+
+    setResults(results) {
+      this.weather = results;
+      console.log(this.weather);
+    },
+
+    dateBuilder() {
+      const d = new Date();
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const day = days[d.getDay()];
+      const date = d.getDate();
+      const month = months[d.getMonth()];
+      const year = d.getFullYear();
+      return `${day} ${date} ${month} ${year}`;
+    },
   },
+  // },
 };
 </script>
 
@@ -73,29 +114,67 @@ export default {
 }
 
 .app {
-  background-image: url("./assets/warm-bg.jpg");
+  background: linear-gradient(to bottom, #2193b0, #6dd5ed);
   background-position: bottom;
   background-size: cover;
-  height: 100vh;
+  min-height: 100vh;
+  transition: 0.5s;
+}
+
+.app-warm {
+  background: linear-gradient(to bottom, #f2c94c, #f2994a);
   transition: 0.5s;
 }
 
 .search {
-  background: silver;
+  // background: linear-gradient(
+  //   to bottom,
+  //   rgba(0, 0, 0, 0.25),
+  //   rgba(0, 0, 0, 0.75)
+  // );
+  min-height: 100vh;
+  padding: 25px;
+
   &__bar {
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.25);
     background-color: rgba(255, 255, 255, 0.5);
-    border-radius: 0px 16px 0px 16px;
+    border-radius: 10px;
     transition: 0.4s;
     width: 90%;
     padding: 15px;
     font-size: 20px;
+    outline: none;
+    border: none;
 
     &:focus {
       box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.25);
       background-color: rgba(255, 255, 255, 0.75);
-      border-radius: 16px 0px 16px 0px;
+      border-radius: 20px;
     }
+  }
+}
+
+.weather {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 50px;
+
+  &__wrapper {
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    color: #fafafa;
+  }
+
+  &__stat {
+    font-size: 20px;
+    font-style: italic;
+  }
+
+  &__temperature {
+    font-size: 90px;
+    text-shadow: 3px 6px rgba(0, 0, 0, 0.25);
   }
 }
 </style>
