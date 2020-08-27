@@ -173,7 +173,7 @@ $desktop-breakpoint: 1200px;
 }
 
 .weather {
-  margin-top: 25%;
+  margin-top: 10vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -211,7 +211,7 @@ $desktop-breakpoint: 1200px;
   }
 
   .weather {
-    margin-top: 25%;
+    margin-top: 20vh;
     &__wrapper {
       width: 75%;
       display: flex;
@@ -235,12 +235,6 @@ $desktop-breakpoint: 1200px;
     &__location {
       font-size: 24px;
     }
-  }
-}
-
-@include desktop {
-  .weather {
-    margin-top: 10%;
   }
 }
 </style>
